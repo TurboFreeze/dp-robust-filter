@@ -22,6 +22,5 @@ Only the first two files are needed for our algorithm, while the following two a
 
 ### Reproducibility
 
-`compareDPMeanEstimators.m` and `compareDPMeanEstimatorsMore.m` contains all the evaluation code for reproducing all figures
-in the paper.
+`compareDPMeanEstimators.m` contains all the evaluation code for reproducing all figures in the paper. `compareDPMeanEstimatorsFunctional.m` contains experimental code on using corruption values that are a function of data set size.
 

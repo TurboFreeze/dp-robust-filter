@@ -10,19 +10,21 @@ function plot = differentDims()
     dpeps = 1.0;
 
     dpFilterErr = [];
+    dpFilterFunErr = [];
     dpWinsorizeErr = [];
     sampErr = [];
     noisySampErr = [];
     ds = 100:50:400;
 
-    N = 100000;
-    eps = 1 / N;
+    N = 100;
+    eps = 0.1;
     for d = ds
         fprintf('Training with dimension = %d, number of samples = %d \n', d, round(N, 0))
         sumDPFilterErr = 0;
         sumDPWinsorizeErr = 0;
         sumSampErr = 0;
         sumNoisySampErr = 0;
+        sumDPFilterFunErr = 0;
 
         % set tau
         tau = 1 / N;
@@ -53,22 +55,28 @@ function plot = differentDims()
         fprintf('DP Filter...')
         sumDPFilterErr = sumDPFilterErr + norm(dpFilterGaussianMean(X, eps, tau, cher, C, dpeps) - ones(1, d));
         fprintf('done\n')
+        
+        fprintf('DP Filter Function of N...')
+        sumDPFilterFunErr = sumDPFilterFunErr + norm(dpFilterGaussianMean(X, 1 / N, tau, cher, C, dpeps) - ones(1, d));
+        fprintf('done\n')
 
         dpFilterErr = [dpFilterErr sumDPFilterErr];
+        dpFilterFunErr = [dpFilterFunErr sumDPFilterFunErr];
         dpWinsorizeErr = [dpWinsorizeErr sumDPWinsorizeErr];
         sampErr = [sampErr sumSampErr];
         noisySampErr = [noisySampErr sumNoisySampErr];
     end
 
     dpFilterErr = dpFilterErr - sampErr;
+    dpFilterFunErr = dpFilterFunErr - sampErr;
     dpWinsorizeErr = dpWinsorizeErr - sampErr;
     noisySampErr = noisySampErr - sampErr;
 
-    semilogy(ds, dpFilterErr, '-ro', ds, dpWinsorizeErr, '-.b', 'LineWidth', 2)
-    title(strcat('Size: ', num2str(N), ', Gamma: ', num2str(eps)))
+    semilogy(ds, dpFilterErr, '-go', ds, dpFilterFunErr, '-ro', ds, dpWinsorizeErr, '-.b', 'LineWidth', 2)
+    title(strcat('Size: ', num2str(N)))%, ', Gamma: ', num2str(eps)))
     xlabel('Dimension')
     ylabel('Excess L2 error')
-    legend('DP Filter', 'DP Winsorized')
+    legend(['DP Filter with Gamma of', ' ', num2str(eps)], 'DP Filter with Gamma of 1/n', 'DP Winsorized')
 end
 
 function plot = differentSizes()
